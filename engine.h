@@ -173,7 +173,6 @@ namespace RGNDS {
 
                 void moveInDirection( float distance );
 
-            private:
                 float ang = 0.0;
                 RGNDS::Point<float> dir = {1.0f, 0.0f};
             };
