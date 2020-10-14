@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __RGNDS_ENGINE_H__
+#define __RGNDS_ENGINE_H__ 1
 
 #include <nds.h>
 #include <gl2d.h>
@@ -11,6 +12,15 @@
 #ifndef PI2
 #define PI2 6.28318530
 #endif // PI2
+
+#ifdef TARGET_DEBUG
+#include <iostream>
+#define Engine_Debug_Init() consoleDebugInit(DebugDevice_NOCASH)
+#define Engine_Log(x)       std::cerr << x << std::endl
+#else
+#define Engine_Debug_Init()
+#define Engine_Log(x) /* x */
+#endif // NDEBUG
 
 namespace RGNDS {
     struct PointF;
@@ -238,3 +248,6 @@ namespace RGNDS {
     };
 
 }
+
+#endif // __RGNDS_ENGINE_H__
+

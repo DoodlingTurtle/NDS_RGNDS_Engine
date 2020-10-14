@@ -707,6 +707,8 @@ namespace RGNDS {
 
         Timer::init();   // Setup timer for the Engine
 
+        Engine_Debug_Init();
+
         Engine::initialized = true;
     }
 
