@@ -22,6 +22,9 @@
 #define Engine_Log(x) /* x */
 #endif // NDEBUG
 
+#define Engine_RandF() ((float)rand() / (float)RAND_MAX)
+
+
 namespace RGNDS {
     struct PointF;
 
@@ -176,12 +179,13 @@ namespace RGNDS {
 
                 virtual void draw( unsigned short abgr16color, int screen = 0, ScreenObj* parent = nullptr){};
 
+                void moveInDirection( float distance );
+
             protected:
 
                 void setAngle(float radiants);
                 void setAngleRel( float radiants );
 
-                void moveInDirection( float distance );
 
                 float ang = 0.0;
                 RGNDS::Point<float> dir = {1.0f, 0.0f};
