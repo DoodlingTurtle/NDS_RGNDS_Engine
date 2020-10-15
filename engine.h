@@ -23,6 +23,7 @@
 #endif // NDEBUG
 
 #define Engine_RandF() ((float)rand() / (float)RAND_MAX)
+#define Engine_Color16(a, r, g, b) ((r&31)|((g&31)<<5)|((b&31)<<10)|((a&1)<<15))
 
 
 namespace RGNDS {
@@ -229,6 +230,8 @@ namespace RGNDS {
             static void drawLine(Point<int> startPoint, Point<int> endPoint, unsigned short color);
             static void drawText(int x, int y, const char* txt, u16 color=0xFFFF);
             static void drawTriangle(const Point<int> p1, const Point<int> p2, const Point<int>p3, unsigned short c, bool filled);
+            static void drawCircle(const Point<int>& pos, float radius, byte resolution, unsigned short color);
+
         protected:
 
             /* \brief should only be called once

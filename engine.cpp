@@ -824,5 +824,22 @@ namespace RGNDS {
         else
             glTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, c);
     }
+    void Engine::drawCircle(const Point<int>& p, float r, byte s, unsigned short c) {
+        float angStep = PI2/s;
 
+        int x1, y1, x2, y2;
+        x1 = cos(0) * r + p.x;
+        y1 = sin(0) * r + p.y;
+
+        for(byte a = 1; a <= s; a++) {
+            x2 = cos(angStep * a) * r + p.x;
+            y2 = sin(angStep * a) * r + p.y;
+
+            glLine(x1, y1, x2, y2, c);
+
+            x1 = x2;
+            y1 = y2;
+        }
+
+    }
 }
