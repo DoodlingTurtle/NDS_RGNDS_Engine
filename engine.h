@@ -77,6 +77,15 @@ namespace RGNDS {
 
 
         template<typename A>
+        Point<T>* operator*=(const Point<A>& p) {
+            this->x *= p.x;
+            this->y *= p.y;
+
+            return this;
+        }
+
+
+        template<typename A>
         Point<T>* operator+=(const A& p) {
             this->x += p;
             this->y += p;
