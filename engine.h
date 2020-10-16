@@ -2,8 +2,7 @@
 #define __RGNDS_ENGINE_H__ 1
 
 #include <nds.h>
-#include <gl2d.h>
-
+#include "../RGNDS_GL2D/gl2d.h"
 
 #ifndef PI
 #define PI 3.14159265
@@ -258,7 +257,6 @@ namespace RGNDS {
             int   errorCode;
 
             static bool initialized;    //
-            static glImage font[64];
             static int FontTilesTextureID;
 
     };

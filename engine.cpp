@@ -4,9 +4,11 @@
 #include <math.h>
 
 #include <nds.h>
-#include <gl2d.h>
+#include "gl2d/gl2d.cpp"
 
 namespace RGNDS {
+
+    static EngineGL2D::glImage font[64];
 
     namespace Timer {
 
@@ -653,7 +655,6 @@ namespace RGNDS {
  * Engine
  *===========================================================================*/
 
-    glImage Engine::font[64];
     int     Engine::FontTilesTextureID;
     bool    Engine::initialized = false;
 
@@ -688,11 +689,11 @@ namespace RGNDS {
 
         bgInitSub(3, BgType_Bmp16, BgSize_B16_256x256, 0, 0);
 
-        glScreen2D();           // Initialize GL2D Engine
+        EngineGL2D::glScreen2D();           // Initialize GL2D Engine
 
         //set up a 4x3 grid of 64x64 sprites to cover the screen and arrange them accordingly
         // Load Font
-        FontTilesTextureID = glLoadTileSet(
+        FontTilesTextureID = EngineGL2D::glLoadTileSet(
             font,      // The Result data will be put here
             8, 8,           // The size of one tile inside the tileset
             8, 512,         // The size of the entire spritesheet/tileset-image
@@ -749,14 +750,18 @@ namespace RGNDS {
                 vramSetBankC(VRAM_C_LCD);
                 vramSetBankD(VRAM_D_SUB_SPRITE);
                 REG_DISPCAPCNT = DCAP_BANK(2) | DCAP_ENABLE | DCAP_SIZE(3);
+                EngineGL2D::glBegin2D();
                 this->onDraw( deltaTime, 0 );
+                EngineGL2D::glEnd2D();
             }
             else {
                 lcdMainOnTop();
                 vramSetBankD(VRAM_D_LCD);
                 vramSetBankC(VRAM_C_SUB_BG);
             	REG_DISPCAPCNT = DCAP_BANK(3) | DCAP_ENABLE | DCAP_SIZE(3);
+            	EngineGL2D::glBegin2D();
                 this->onDraw( deltaTime, SCREEN_HEIGHT );
+                EngineGL2D::glEnd2D();
             }
             glFlush(0);
             swiWaitForVBlank();
@@ -805,7 +810,7 @@ namespace RGNDS {
                 c = 32;
 
         // Translate Char to TileIndex
-            glSprite(newX, newY, GL_FLIP_NONE, &(font[c-32]));
+            EngineGL2D::glSprite(newX, newY, GL_FLIP_NONE, &(font[c-32]));
 
             newX+=8;
             ptr++;
@@ -816,13 +821,13 @@ namespace RGNDS {
 
     }
     void Engine::drawLine(const Point<int> s, const Point<int> e, unsigned short c) {
-        glLine(s.x, s.y, e.x, e.y, c);
+        EngineGL2D::glLine(s.x, s.y, e.x, e.y, c);
     }
     void Engine::drawTriangle(const Point<int> p1, const Point<int> p2, const Point<int>p3, unsigned short c, bool filled) {
         if(filled)
-            glTriangleFilled(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, c);
+            EngineGL2D::glTriangleFilled(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, c);
         else
-            glTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, c);
+            EngineGL2D::glTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, c);
     }
     void Engine::drawCircle(const Point<int>& p, float r, byte s, unsigned short c) {
         float angStep = PI2/s;
@@ -835,7 +840,7 @@ namespace RGNDS {
             x2 = cos(angStep * a) * r + p.x;
             y2 = sin(angStep * a) * r + p.y;
 
-            glLine(x1, y1, x2, y2, c);
+            EngineGL2D::glLine(x1, y1, x2, y2, c);
 
             x1 = x2;
             y1 = y2;
