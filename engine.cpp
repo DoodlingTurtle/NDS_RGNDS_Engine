@@ -626,28 +626,21 @@ namespace RGNDS {
     }
 
     void Engine::PolyObj::draw(unsigned short c, int screen, ScreenObj* parent) {
-        if(parent == nullptr) {
-            for(int a = 0; a < numPoints; a+=3) {
-                RGNDS::Engine::drawTriangle(
-                    translatePoint(points[a  ], screen).to<int>()
-                  , translatePoint(points[a+1], screen).to<int>()
-                  , translatePoint(points[a+2], screen).to<int>()
-                  , c
-                  , true
-                );
-            }
-        }
-        else {
-            for(int a = 0; a < numPoints; a+=3) {
-                RGNDS::Engine::drawTriangle(
-                    parent->translatePoint(points[a  ], screen).to<int>()
-                  , parent->translatePoint(points[a+1], screen).to<int>()
-                  , parent->translatePoint(points[a+2], screen).to<int>()
-                  , c
-                  , true
-                );
-            }
-        }
+
+        Point<int> p[numPoints];
+
+        if(parent == nullptr)
+            for(int a = 0; a < numPoints; a++)
+                p[a] = translatePoint(points[a], screen).to<int>();
+
+        else
+            for(int a = 0; a < numPoints; a++)
+                p[a] = parent->translatePoint(points[a], screen).to<int>();
+
+        EngineGL2D::glStartShape( GL_TRIANGLE );
+            glColor( c );
+            EngineGL2D::glSetPoints(numPoints, p);
+        RGNDS::EngineGL2D::glEndShape();
 
     }
 
@@ -810,7 +803,7 @@ namespace RGNDS {
                 c = 32;
 
         // Translate Char to TileIndex
-            EngineGL2D::glSprite(newX, newY, GL_FLIP_NONE, &(font[c-32]));
+            EngineGL2D::glSprite(newX, newY, EngineGL2D::GL_FLIP_NONE, &(font[c-32]));
 
             newX+=8;
             ptr++;

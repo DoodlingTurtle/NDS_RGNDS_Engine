@@ -15,51 +15,33 @@
 #define __RGNDS_ENGINE_GL2D_C__ 1
 
 #include <nds/arm9/videoGL.h>
-#include "gl2d.h"
 
-static inline void gxVertex3i(v16 x, v16 y, v16 z) {
+inline void gxVertex3i(v16 x, v16 y, v16 z) {
     GFX_VERTEX16 = (y << 16) | (x & 0xFFFF);
     GFX_VERTEX16 = ((uint32)(uint16)z);
 }
-static inline void gxVertex2i(v16 x, v16 y) {
+inline void gxVertex2i(v16 x, v16 y) {
     GFX_VERTEX_XY = (y << 16) | (x & 0xFFFF);
 }
-static inline void gxTexcoord2i(t16 u, t16 v) {
+inline void gxTexcoord2i(t16 u, t16 v) {
     GFX_TEX_COORD = (v << 20) | ( (u << 4) & 0xFFFF );
 }
-static inline void gxScalef32(s32 x, s32 y, s32 z) {
+inline void gxScalef32(s32 x, s32 y, s32 z) {
     MATRIX_SCALE = x;
     MATRIX_SCALE = y;
     MATRIX_SCALE = z;
 }
 
-static inline void gxTranslate3f32( int32 x, int32 y, int32 z ) {
+inline void gxTranslate3f32( int32 x, int32 y, int32 z ) {
     MATRIX_TRANSLATE = x;
     MATRIX_TRANSLATE = y;
     MATRIX_TRANSLATE = z;
 }
 
-static v16 g_depth = 0;
+v16 g_depth = 0;
 extern int gCurrentTexture;
 
 namespace RGNDS {
-
-
-    class EngineGL2D {
-    public:
-
-        typedef struct
-        {
-
-            int		width;		/*!< Width of the Sprite */
-            int 	height;		/*!< Height of the Sprite */
-            int 	u_off;		/*!< S texture offset */
-            int 	v_off;		/*!< T texture offset */
-            int		textureID;  /*!< Texture handle ( used in glDeleteTextures() ) <Br>
-                                     The texture handle in VRAM (returned by glGenTextures()) <Br>
-                                     ie. This references the actual texture stored in VRAM */
-
-        } glImage;
 
 
     /******************************************************************************
@@ -67,13 +49,13 @@ namespace RGNDS {
      *****************************************************************************/
 
 
-        static void SetOrtho( void ) {
+        void EngineGL2D::SetOrtho( void ) {
             glMatrixMode( GL_PROJECTION );     // set matrixmode to projection
             glLoadIdentity();				 // reset
             glOrthof32( 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, -1 << 12, 1 << 12 );  // downscale projection matrix
         }
 
-        static void glScreen2D( void ) {
+        void EngineGL2D::glScreen2D( void ) {
 
             // initialize gl
             glInit();
@@ -125,7 +107,7 @@ namespace RGNDS {
        drawing or sprite functions.
 
     ******************************************************************************/
-        static void glBegin2D( void ) {
+        void EngineGL2D::glBegin2D( void ) {
 
 
             // save 3d perpective projection matrix
@@ -170,7 +152,7 @@ namespace RGNDS {
         The compliment of glBegin2D
 
     ******************************************************************************/
-        static void glEnd2D( void ) {
+        void EngineGL2D::glEnd2D( void ) {
 
             // restore 3d matrices and set current matrix to modelview
             glMatrixMode( GL_PROJECTION );
@@ -178,6 +160,27 @@ namespace RGNDS {
             glMatrixMode( GL_MODELVIEW );
             glPopMatrix( 1 );
 
+        }
+
+
+        void EngineGL2D::glStartShape(GL_GLBEGIN_ENUM type) {
+            glBindTexture( 0, 0 );
+            glBegin(type);
+        }
+
+        void EngineGL2D::glSetPoints(int numPoints, const Point<int> aPoints[]) {
+            if(numPoints <= 0) return;
+            gxVertex3i( aPoints[0].x, aPoints[0].y, g_depth );
+
+            for(int a = 1; a < numPoints; a++) {
+                gxVertex2i(aPoints[a].x, aPoints[a].y);
+            }
+        }
+
+        void EngineGL2D::glEndShape() {
+            glEnd();
+            g_depth++;
+            gCurrentTexture = 0;
         }
 
 
@@ -189,7 +192,7 @@ namespace RGNDS {
                 color 	-> RGB15/ARGB16 color
 
         ******************************************************************************/
-        static void glPutPixel( int x, int y, int color ) {
+        void EngineGL2D::glPutPixel( int x, int y, int color ) {
 
             glBindTexture( 0, 0 );
             glColor( color);
@@ -213,7 +216,7 @@ namespace RGNDS {
                 color 	-> RGB15/ARGB16 color
 
         ******************************************************************************/
-        static void glLine( int x1, int y1, int x2, int y2, int color )
+        void EngineGL2D::glLine( int x1, int y1, int x2, int y2, int color )
         {
 
             x2++;
@@ -242,7 +245,7 @@ namespace RGNDS {
                 color 	-> RGB15/ARGB16 color
 
         ******************************************************************************/
-        static void glBox( int x1, int y1, int x2, int y2, int color )
+        void EngineGL2D::glBox( int x1, int y1, int x2, int y2, int color )
         {
 
             x2++;
@@ -284,7 +287,7 @@ namespace RGNDS {
                 color 	-> RGB15/ARGB16 color
 
         ******************************************************************************/
-        static void glBoxFilled( int x1, int y1, int x2, int y2, int color )
+        void EngineGL2D::glBoxFilled( int x1, int y1, int x2, int y2, int color )
         {
 
             x2++;
@@ -318,7 +321,7 @@ namespace RGNDS {
 
 
         ******************************************************************************/
-        static void glBoxFilledGradient( int x1, int y1, int x2, int y2,
+        void EngineGL2D::glBoxFilledGradient( int x1, int y1, int x2, int y2,
                                   int color1, int color2, int color3, int color4
                                 )
         {
@@ -351,7 +354,7 @@ namespace RGNDS {
                 color 	-> RGB15/ARGB16 color of the triangle
 
         ******************************************************************************/
-        static void glTriangle( int x1, int y1, int x2, int y2, int x3, int y3, int color )
+        void EngineGL2D::glTriangle( int x1, int y1, int x2, int y2, int x3, int y3, int color )
         {
 
             glBindTexture( 0, 0 );
@@ -387,7 +390,7 @@ namespace RGNDS {
                 color 	-> RGB15/ARGB16 color of the triangle
 
         ******************************************************************************/
-        static void glTriangleFilled( int x1, int y1, int x2, int y2, int x3, int y3, int color )
+        void EngineGL2D::glTriangleFilled( int x1, int y1, int x2, int y2, int x3, int y3, int color )
         {
 
             glBindTexture( 0, 0 );
@@ -416,7 +419,7 @@ namespace RGNDS {
                 color3 	-> RGB15/ARGB16 color of the triangle
 
         ******************************************************************************/
-        static void glTriangleFilledGradient( int x1, int y1, int x2, int y2, int x3, int y3,
+        void EngineGL2D::glTriangleFilledGradient( int x1, int y1, int x2, int y2, int x3, int y3,
                                        int color1, int color2, int color3
                                      )
         {
@@ -445,7 +448,7 @@ namespace RGNDS {
                 *spr 		-> pointer to a glImage
 
         ******************************************************************************/
-        static void glSprite( int x, int y, int flipmode, const EngineGL2D::glImage *spr )
+        void EngineGL2D::glSprite( int x, int y, int flipmode, const EngineGL2D::glImage *spr )
         {
             int x1 = x;
             int y1 = y;
@@ -490,7 +493,7 @@ namespace RGNDS {
                 *spr 		-> pointer to a glImage
 
         ******************************************************************************/
-        static void glSpriteScale( int x, int y, s32 scale, int flipmode, const EngineGL2D::glImage *spr )
+        void EngineGL2D::glSpriteScale( int x, int y, s32 scale, int flipmode, const EngineGL2D::glImage *spr )
         {
             int x1 = 0;
             int y1 = 0;
@@ -542,7 +545,7 @@ namespace RGNDS {
                 *spr 		-> pointer to a glImage
 
         ******************************************************************************/
-        static void glSpriteScaleXY( int x, int y, s32 scaleX, s32 scaleY, int flipmode, const EngineGL2D::glImage *spr )
+        void EngineGL2D::glSpriteScaleXY( int x, int y, s32 scaleX, s32 scaleY, int flipmode, const EngineGL2D::glImage *spr )
         {
             int x1 = 0;
             int y1 = 0;
@@ -591,7 +594,7 @@ namespace RGNDS {
                 *spr 		-> pointer to a glImage
 
         ******************************************************************************/
-        static void glSpriteRotate( int x, int y, s32 angle, int flipmode, const EngineGL2D::glImage *spr )
+        void EngineGL2D::glSpriteRotate( int x, int y, s32 angle, int flipmode, const EngineGL2D::glImage *spr )
         {
 
             int s_half_x = ((spr->width) + (spr->width & 1)) / 2;
@@ -649,7 +652,7 @@ namespace RGNDS {
                 *spr 		-> pointer to a glImage
 
         ******************************************************************************/
-        static void glSpriteRotateScale( int x, int y, s32 angle, s32 scale, int flipmode, const EngineGL2D::glImage *spr)
+        void EngineGL2D::glSpriteRotateScale( int x, int y, s32 angle, s32 scale, int flipmode, const EngineGL2D::glImage *spr)
         {
 
             int s_half_x = ((spr->width) + (spr->width & 1)) / 2;
@@ -709,7 +712,7 @@ namespace RGNDS {
                 *spr 		-> pointer to a glImage
 
         ******************************************************************************/
-        static void glSpriteRotateScaleXY( int x, int y, s32 angle, s32 scaleX, s32 scaleY, int flipmode, const EngineGL2D::glImage *spr)
+        void EngineGL2D::glSpriteRotateScaleXY( int x, int y, s32 angle, s32 scaleX, s32 scaleY, int flipmode, const EngineGL2D::glImage *spr)
         {
 
             int s_half_x = ((spr->width) + (spr->width & 1)) / 2;
@@ -767,7 +770,7 @@ namespace RGNDS {
 
 
         ******************************************************************************/
-        static void glSpriteStretchHorizontal(int x, int y, int length_x, const EngineGL2D::glImage *spr )
+        void EngineGL2D::glSpriteStretchHorizontal(int x, int y, int length_x, const EngineGL2D::glImage *spr )
         {
             int x1 = x;
             int y1 = y;
@@ -864,7 +867,7 @@ namespace RGNDS {
                 *spr 		-> pointer to a glImage
 
         ******************************************************************************/
-        static void glSpriteOnQuad( int x1, int y1,
+        void EngineGL2D::glSpriteOnQuad( int x1, int y1,
                              int x2, int y2,
                              int x3, int y3,
                              int x4, int y4,
@@ -913,7 +916,7 @@ namespace RGNDS {
                 param 		-> parameters for the texture (see glTexImage2d)
 
         ******************************************************************************/
-        static int glLoadSpriteSet( EngineGL2D::glImage              *sprite,
+        int EngineGL2D::glLoadSpriteSet( EngineGL2D::glImage              *sprite,
                              const unsigned int   numframes,
                              const unsigned int   *texcoords,
                              GL_TEXTURE_TYPE_ENUM type,
@@ -967,7 +970,7 @@ namespace RGNDS {
                 param 		-> parameters for the texture (see glTexImage2d)
 
         ******************************************************************************/
-        static int glLoadTileSet( EngineGL2D::glImage              *sprite,
+        int EngineGL2D::glLoadTileSet( EngineGL2D::glImage              *sprite,
                            int                  tile_wid,
                            int                  tile_hei,
                            int                  bmp_wid,
@@ -1008,7 +1011,7 @@ namespace RGNDS {
 
             return textureID;
         }
-    };
+
 };
 
 
