@@ -2,7 +2,6 @@
 #define __RGNDS_ENGINE_H__ 1
 
 #include <nds.h>
-#include "../RGNDS_GL2D/gl2d.h"
 
 #ifndef PI
 #define PI 3.14159265
@@ -18,7 +17,7 @@
 #define Engine_Log(x)       std::cerr << x << std::endl
 #else
 #define Engine_Debug_Init()
-#define Engine_Log(x) /* x */
+#define Engine_Log(x) /**/
 #endif // NDEBUG
 
 #define Engine_RandF() ((float)rand() / (float)RAND_MAX)

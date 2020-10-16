@@ -11,6 +11,9 @@
 
 ******************************************************************************/
 
+#ifndef __RGNDS_ENGINE_GL2D_C__
+#define __RGNDS_ENGINE_GL2D_C__ 1
+
 #include <nds/arm9/videoGL.h>
 #include "gl2d.h"
 
@@ -1007,3 +1010,7 @@ namespace RGNDS {
         }
     };
 };
+
+
+#endif // __RGNDS_ENGINE_GL2D_C__
+
