@@ -162,23 +162,21 @@ namespace RGNDS {
 
         }
 
-
-        void EngineGL2D::glStartShape(GL_GLBEGIN_ENUM type) {
-            glBindTexture( 0, 0 );
-            glBegin(type);
-        }
-
-        void EngineGL2D::glSetPoints(int numPoints, const Point<int> aPoints[]) {
+        void EngineGL2D::glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<int> aPoints[]) {
             if(numPoints <= 0) return;
-            gxVertex3i( aPoints[0].x, aPoints[0].y, g_depth );
 
-            for(int a = 1; a < numPoints; a++) {
-                gxVertex2i(aPoints[a].x, aPoints[a].y);
-            }
-        }
+            glBindTexture( 0, 0 );
+            glColor(color);
+            glBegin(mode);
 
-        void EngineGL2D::glEndShape() {
+                gxVertex3i( aPoints[0].x, aPoints[0].y, g_depth );
+
+                for(int a = 1; a < numPoints; a++) {
+                    gxVertex2i(aPoints[a].x, aPoints[a].y);
+                }
+
             glEnd();
+            glColor(0x7fff);
             g_depth++;
             gCurrentTexture = 0;
         }

@@ -627,20 +627,6 @@ namespace RGNDS {
 
     void Engine::PolyObj::draw(unsigned short c, int screen, ScreenObj* parent) {
 
-        Point<int> p[numPoints];
-
-        if(parent == nullptr)
-            for(int a = 0; a < numPoints; a++)
-                p[a] = translatePoint(points[a], screen).to<int>();
-
-        else
-            for(int a = 0; a < numPoints; a++)
-                p[a] = parent->translatePoint(points[a], screen).to<int>();
-
-        EngineGL2D::glStartShape( GL_TRIANGLE );
-            glColor( c );
-            EngineGL2D::glSetPoints(numPoints, p);
-        RGNDS::EngineGL2D::glEndShape();
 
     }
 

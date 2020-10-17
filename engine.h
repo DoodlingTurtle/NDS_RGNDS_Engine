@@ -24,122 +24,10 @@
 #define Engine_RandF() ((float)rand() / (float)RAND_MAX)
 #define Engine_Color16(a, r, g, b) ((r&31)|((g&31)<<5)|((b&31)<<10)|((a&1)<<15))
 
+#include "inc/points.h"
+
 
 namespace RGNDS {
-    struct PointF;
-
-    template <typename T>
-    struct Point {
-        T x = 0, y = 0;
-
-        template<typename A>
-        Point<T>* operator=(const Point<A>& p) const {
-            this.x = p.x;
-            this.y = p.y;
-            return this;
-        }
-        template<typename A>
-        Point<T> operator+(const Point<A>& p) const {
-            Point<T> o;
-            o.x = this->x + p.x;
-            o.y = this->y + p.y;
-            return o;
-        }
-        template<typename A>
-        Point<T> operator*(const Point<A>& p) const {
-            Point<T> o;
-            o.x = this->x * p.x;
-            o.y = this->y * p.y;
-            return o;
-        }
-        template<typename A>
-        Point<T> operator-(const Point<A>& p) const {
-            Point<T> o;
-            o.x = this->x - p.x;
-            o.y = this->y - p.y;
-            return o;
-        }
-
-        template<typename A>
-        Point<T>* operator+=(const Point<A>& p) {
-            this->x += p.x;
-            this->y += p.y;
-            return this;
-        }
-
-        template<typename A>
-        Point<T> operator*(const A& p) const {
-            Point<T> o;
-            o.x = this->x * p;
-            o.y = this->y * p;
-            return o;
-        }
-
-
-        template<typename A>
-        Point<T>* operator*=(const Point<A>& p) {
-            this->x *= p.x;
-            this->y *= p.y;
-
-            return this;
-        }
-
-
-        template<typename A>
-        Point<T>* operator+=(const A& p) {
-            this->x += p;
-            this->y += p;
-            return this;
-        }
-        template<typename A>
-        Point<T>* operator*=(const A& p) {
-            this->x *= p;
-            this->y *= p;
-            return this;
-        }
-
-        template<typename A>
-        Point<T> operator-(const A& p) const {
-            Point<T> o;
-            o.x = this->x - p;
-            o.y = this->y - p;
-            return o;
-        }
-
-        template<typename A>
-        Point<T> operator/(const A& p) const {
-            Point<T> o;
-            if(p == 0)
-                return o;
-
-            o.x = this->x / p;
-            o.y = this->y / p;
-            return o;
-        }
-
-
-        template<typename A>
-        Point<A> to() const {
-            Point<A> o;
-            o.x = (A)this->x;
-            o.y = (A)this->y;
-            return o;
-        }
-
-        T dist() const {
-            return sqrt(this->x*this->x + this->y*this->y);
-        }
-
-        Point<T> normalize() const {
-            Point<T> o;
-            T d = this->dist();
-            o.x = this->x / d;
-            o.y = this->y / d;
-            return o;
-        }
-
-    };
-
 
     class EngineGL2D {
     public:
@@ -169,9 +57,7 @@ namespace RGNDS {
         static void glBegin2D();
         static void glEnd2D();
 
-        static void glStartShape(GL_GLBEGIN_ENUM);
-        static void glEndShape();
-        static void glSetPoints(int, const Point<int>[]);
+        static void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<int> aPoints[]);
 
         static void glPutPixel( int x, int y, int color );
         static void glLine( int x1, int y1, int x2, int y2, int color );
@@ -280,6 +166,9 @@ namespace RGNDS {
 
                 virtual Point<float> translatePoint(const Point<float>& in, int screen);
 
+                template <typename T>
+                void translate(Point<T>& in, Point<T>* out, ScreenObj* parent = nullptr);
+
                 virtual void draw( unsigned short abgr16color, int screen = 0, ScreenObj* parent = nullptr){};
 
                 void moveInDirection( float distance );
@@ -354,6 +243,30 @@ namespace RGNDS {
             static int FontTilesTextureID;
 
     };
+
+
+    template <typename T>
+    void Engine::ScreenObj::translate(Point<T>& in, Point<T>* out, Engine::ScreenObj* parent) {
+        if(parent == nullptr)
+            parent = this;
+
+        Point<double> tr;
+
+        /*
+        +-  -+   +--                  --+   +-  -+
+        |tr.x| = | cos(ang), - sin(ang) | * |in.x|
+        |tr.y|   | sin(ang),   cos(ang) |   |in.y|
+        +-  -+   +--                  --+   +-  -+
+        */
+
+        tr.x = parent->dir.x * in.x + -parent->dir.y * in.y;
+        tr.y = parent->dir.y * in.x +  parent->dir.x * in.y;
+
+        tr *= parent->scale;
+        tr += parent->pos;
+
+        *out = tr.to<T>();
+    }
 
 }
 
