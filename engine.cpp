@@ -614,20 +614,30 @@ namespace RGNDS {
 /*=============================================================================
  * Engine::PolyObj
  *===========================================================================*/
-    Engine::PolyObj::PolyObj(short c, const Point<float> aPoints[]) {
-        numPoints = c * 3;
+    Engine::PolyObj::PolyObj(short c, const Point<float> aPoints[], int col, GL_GLBEGIN_ENUM renderMode) {
+        numPoints = c;
         points = (Point<float>*)valloc(sizeof(Point<float>) * numPoints);
-
         memcpy(points, aPoints, numPoints*sizeof(Point<float>));
+
+        color = col;
+        rendertype = renderMode;
+
     }
     Engine::PolyObj::~PolyObj(){
         if(points != nullptr)
             free(points);
     }
 
-    void Engine::PolyObj::draw(unsigned short c, int screen, ScreenObj* parent) {
+    void Engine::PolyObj::draw(int screen) {
+
+        Point<int> p[numPoints];
+        for(int a = 0 ; a < numPoints; a++) {
+            translate<float, int>(&points[a], &p[a]);
+            p[a].y -= screen;
+        }
 
 
+        EngineGL2D::glShape(rendertype, color, numPoints, p);
     }
 
 /*=============================================================================

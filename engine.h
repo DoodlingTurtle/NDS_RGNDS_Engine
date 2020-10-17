@@ -39,14 +39,13 @@ namespace RGNDS {
                 Point<float>   pos;
                 float scale = 1.0f;
 
-
                 ScreenObj();
                 virtual ~ScreenObj();
 
                 virtual Point<float> translatePoint(const Point<float>& in, int screen);
 
-                template <typename T>
-                void translate(Point<T>& in, Point<T>* out, ScreenObj* parent = nullptr);
+                template <typename TI, typename TO>
+                void translate(Point<TI>* in, Point<TO>* out, ScreenObj* parent = nullptr);
 
                 virtual void draw( unsigned short abgr16color, int screen = 0, ScreenObj* parent = nullptr){};
 
@@ -64,14 +63,37 @@ namespace RGNDS {
 
             class PolyObj : public ScreenObj {
             public:
-                PolyObj(short numTris, const Point<float> aTris[]);
+
+  /* rendermode:
+
+  GL_TRIANGLES      GL_TRIANGLE_STRIP
+  v0                 v2___v4____v6
+  |\      v3         /|\  |\    /\
+  | \     /\      v0( | \ | \  /  \
+  |__\   /__\        \|__\|__\/____\
+  v1 v2 v4  v5       v1   v3  v5   v7
+
+  GL_QUADS                GL_QUAD_STRIP
+    v0__v3                 v0__v2____v4     v10__
+     /  \   v4____v7        /  \     |\ _____ / /v11
+    /    \   |    \        /    \    | |v6 v8| /
+   /______\  |_____\      /______\___|_|_____|/
+  v1    v2  v5    v6     v1    v3  v5 v7    v9
+
+*/
+
+                PolyObj(short numTris, const Point<float> aTris[], int color, GL_GLBEGIN_ENUM rendermode);
                 ~PolyObj();
 
-                virtual void draw(unsigned short abgr16color, int screen=0, ScreenObj* parent = nullptr);
+                virtual void draw(int screen=0);
+
+                unsigned short color;
 
             protected:
                 short numPoints = 0;
                 Point<float> *points;
+                GL_GLBEGIN_ENUM rendertype;
+
             };
 
 
@@ -124,8 +146,8 @@ namespace RGNDS {
     };
 
 
-    template <typename T>
-    void Engine::ScreenObj::translate(Point<T>& in, Point<T>* out, Engine::ScreenObj* parent) {
+    template <typename TI, typename TO>
+    void Engine::ScreenObj::translate(Point<TI>* in, Point<TO>* out, Engine::ScreenObj* parent) {
         if(parent == nullptr)
             parent = this;
 
@@ -138,13 +160,13 @@ namespace RGNDS {
         +-  -+   +--                  --+   +-  -+
         */
 
-        tr.x = parent->dir.x * in.x + -parent->dir.y * in.y;
-        tr.y = parent->dir.y * in.x +  parent->dir.x * in.y;
+        tr.x = parent->dir.x * in->x + -parent->dir.y * in->y;
+        tr.y = parent->dir.y * in->x +  parent->dir.x * in->y;
 
         tr *= parent->scale;
         tr += parent->pos;
 
-        *out = tr.to<T>();
+        *out = tr.to<TO>();
     }
 
 }
