@@ -9,6 +9,10 @@ namespace RGNDS {
     namespace GL2D {
         class PolyShape {
         public:
+
+            static PolyShape* createCircle(float radius, int edges, int thickness=0);
+
+
             /* rendermode:
 
             GL_TRIANGLES      GL_TRIANGLE_STRIP
