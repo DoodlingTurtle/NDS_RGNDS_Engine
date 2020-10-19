@@ -71,7 +71,11 @@ namespace RGNDS {
     void Engine::error(const char* msg, int code) {
         this->keepRunning = false;
         this->lastError = msg;
-        this->errorCode = code;
+        this->errorCode = code ? code : -1;
+    }
+
+    void Engine::exit() {
+        this->keepRunning = false;
     }
 
     void Engine::run() {
