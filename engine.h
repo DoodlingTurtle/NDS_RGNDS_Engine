@@ -5,11 +5,11 @@
 #include <nds/arm9/videoGL.h>
 
 #ifndef PI
-#define PI 3.14159265
+#define PI 3.141592653589793238462643383279
 #endif // PI
 
 #ifndef PI2
-#define PI2 6.28318530
+#define PI2 6.283185307179586476925286766558
 #endif // PI2
 
 #ifdef TARGET_DEBUG

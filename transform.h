@@ -24,9 +24,11 @@ namespace RGNDS {
         void setAngle(float radiants);
         void setAngleRel( float radiants );
 
-    protected:
         float ang = 0.0;
         Point<float> dir = {1.0f, 0.0f};
+
+    protected:
+
 
     };
 
@@ -53,6 +55,5 @@ namespace RGNDS {
         *out = tr.to<TO>();
     }
 }
-
 
 #endif // __RGNDS_TRANSFORM_H__

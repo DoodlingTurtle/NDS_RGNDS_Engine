@@ -1,8 +1,20 @@
 #ifndef __RGNDS_GL2D_H__
 #define __RGNDS_GL2D_H__ 1
 
-namespace RGNDS {
+#include "../transform.h"
 
+typedef struct
+        {
+            int		width;		/*!< Width of the Sprite */
+            int 	height;		/*!< Height of the Sprite */
+            int 	u_off;		/*!< S texture offset */
+            int 	v_off;		/*!< T texture offset */
+            int		textureID;  /*!< Texture handle ( used in glDeleteTextures() ) <Br>
+                                     The texture handle in VRAM (returned by glGenTextures()) <Br>
+                                     ie. This references the actual texture stored in VRAM */
+} glImage;
+
+namespace RGNDS {
 
     enum GL_FLIP_MODE {
         GL_FLIP_NONE = 0,
@@ -14,16 +26,8 @@ namespace RGNDS {
 
     namespace GL2D {
 
-        typedef struct
-        {
-            int		width;		/*!< Width of the Sprite */
-            int 	height;		/*!< Height of the Sprite */
-            int 	u_off;		/*!< S texture offset */
-            int 	v_off;		/*!< T texture offset */
-            int		textureID;  /*!< Texture handle ( used in glDeleteTextures() ) <Br>
-                                     The texture handle in VRAM (returned by glGenTextures()) <Br>
-                                     ie. This references the actual texture stored in VRAM */
-        } glImage;
+        extern int defaultFont_TextureID;
+        extern glImage defaultFont[64];
 
         void SetOrtho();
 
@@ -31,8 +35,10 @@ namespace RGNDS {
         void glBegin2D();
         void glEnd2D();
 
-        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<int> aPoints[]);
-        void glSprite( int x, int y, int flipmode, const glImage *spr );
+        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<float> aPoints[], Transform* t = &Transform::_default);
+        void glSprite( int x, int y, int flipmode, const glImage *spr, Transform* tra = &Transform::_default );
+
+        void glText(const char* text, unsigned short color, Transform* trans, glImage font[64] = defaultFont);
 
         int glLoadTileSet(
            glImage              *sprite,
@@ -41,8 +47,8 @@ namespace RGNDS {
            int                  bmp_wid,
            int                  bmp_hei,
            GL_TEXTURE_TYPE_ENUM type,
-           int 	                sizeX,
-           int 	                sizeY,
+           GL_TEXTURE_SIZE_ENUM sizeX,      // Size of entire texture (not just tile-size)
+           GL_TEXTURE_SIZE_ENUM sizeY,      // Size of entire texture (not just tile-size)
            int 	                param,
            int					pallette_width,
            const u16			*palette,
@@ -110,5 +116,6 @@ namespace RGNDS {
 */
     }
 }
+
 
 #endif // __RGNDS_ENGINE_GL2D_H__

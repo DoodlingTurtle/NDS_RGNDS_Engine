@@ -4,6 +4,8 @@
 #include "../transform.h"
 
 namespace RGNDS {
+    Transform Transform::_default = Transform();
+
     Transform::Transform(){}
     Transform::~Transform(){}
 

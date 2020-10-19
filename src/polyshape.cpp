@@ -7,8 +7,8 @@ namespace RGNDS {
     namespace GL2D {
 
         PolyShape* PolyShape::createCircle(float radius, int edges, int thickness) {
-            float angSteps = PI2 / edges;
-            float ang = 0;
+            double angSteps = PI2 / (float)edges;
+            double ang = 0;
             int a;
 
             float radiusinner = 0;
@@ -16,11 +16,11 @@ namespace RGNDS {
             if(thickness > 0)
                 radiusinner = std::min(radius-1, radius-thickness);
 
-            Point<float> p[edges*2+2];
+            Point<double> p[edges*2+2];
 
             for(a = 0; a < (edges+1)*2; a+=2) {
-                p[a  ].x = cos(ang);
-                p[a  ].y = sin(ang);
+                p[a  ].x = cosf(ang);
+                p[a  ].y = sinf(ang);
                 p[a+1].x = p[a].x * radius;
                 p[a+1].y = p[a].y * radius;
                 p[a  ].x *= radiusinner;
@@ -32,10 +32,10 @@ namespace RGNDS {
             return new PolyShape(edges*2+2, p, GL_QUAD_STRIP);
         }
 
-        PolyShape::PolyShape(short c, const Point<float> aPoints[], GL_GLBEGIN_ENUM renderMode) {
+        PolyShape::PolyShape(short c, const Point<double> aPoints[], GL_GLBEGIN_ENUM renderMode) {
             numPoints = c;
-            points = (Point<float>*)valloc(sizeof(Point<float>) * numPoints);
-            memcpy(points, aPoints, numPoints*sizeof(Point<float>));
+            points = (Point<double>*)valloc(sizeof(Point<double>) * numPoints);
+            memcpy(points, aPoints, numPoints*sizeof(Point<double>));
 
             rendertype = renderMode;
 
@@ -46,14 +46,9 @@ namespace RGNDS {
         }
 
         void PolyShape::draw(unsigned short color, short screen, Transform* t) {
-
-            Point<int> p[numPoints];
-            for(int a = 0 ; a < numPoints; a++) {
-                t->translate<float, int>(&points[a], &p[a]);
-                p[a].y -= (int)screen;
-            }
-
-            glShape(rendertype, color, numPoints, p);
+            t->pos.y -= screen;
+            glShape(rendertype, color, numPoints, points, t);
+            t->pos.y += screen;
         }
 
         void PolyShape::setPoint(short index, float x, float y) {

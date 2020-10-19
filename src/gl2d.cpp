@@ -1,7 +1,10 @@
 #ifndef __RGNDS_GL2D_CPP__
 #define __RGNDS_GL2D_CPP__ 1
 
+#include <climits>
+
 #include "../inc/gl2d.h"
+#include "../inc/fonts_res.h"
 
 inline void gxVertex3i(v16 x, v16 y, v16 z) {
     GFX_VERTEX16 = (y << 16) | (x & 0xFFFF);
@@ -27,9 +30,12 @@ inline void gxTranslate3f32( int32 x, int32 y, int32 z ) {
 
 v16 g_depth = 0;
 extern int gCurrentTexture;
-
 namespace RGNDS {
     namespace GL2D {
+
+
+        int defaultFont_TextureID;
+        glImage defaultFont[64];
 
         void SetOrtho( void ) {
             glMatrixMode( GL_PROJECTION );     // set matrixmode to projection
@@ -77,6 +83,20 @@ namespace RGNDS {
 
             //not a real gl function and will likely change
             glPolyFmt( POLY_ALPHA(31) | POLY_CULL_BACK );
+
+
+            defaultFont_TextureID = glLoadTileSet(
+                defaultFont,
+                8, 8,
+                8, 512,
+                GL_RGB256,
+                TEXTURE_SIZE_8,
+                TEXTURE_SIZE_512,
+                GL_TEXTURE_COLOR0_TRANSPARENT,
+                3, RGNDS::_8x8pixelfont_palette,
+                RGNDS::_8x8pixelfont_pixels
+            );
+
         }
 
         void glBegin2D( void ) {
@@ -124,37 +144,39 @@ namespace RGNDS {
 
         }
 
-        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<int> aPoints[]) {
+        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* tra) {
             if(numPoints <= 0) return;
 
             glBindTexture( 0, 0 );
             glColor(color);
-            glBegin(mode);
+            glPushMatrix();
+                glBegin(mode);
+                    glTranslatef32(tra->pos.x, tra->pos.y, 1);
+                    glRotateZ((tra->ang / PI2) * 356); //(tra->ang / PI2) * (0xffff - SHRT_MAX));
+                    glScalef32((1<<12) * tra->scale, (1<<12) * tra->scale, (1<<12));
 
-                gxVertex3i( aPoints[0].x, aPoints[0].y, g_depth );
+                    gxVertex3i( aPoints[0].x, aPoints[0].y, g_depth );
+                    for(int a = 1; a < numPoints; a++) {
+                        gxVertex2i(aPoints[a].x, aPoints[a].y);
+                    }
+                glEnd();
+            glPopMatrix(1);
 
-                for(int a = 1; a < numPoints; a++) {
-                    gxVertex2i(aPoints[a].x, aPoints[a].y);
-                }
-
-            glEnd();
             glColor(0x7fff);
             g_depth++;
             gCurrentTexture = 0;
         }
 
-        void glSprite( int x, int y, int flipmode, const glImage *spr ) {
-            int x1 = x;
-            int y1 = y;
-            int x2 = x + spr->width;
-            int y2 = y + spr->height;
+        void glSprite(int flipmode, const glImage *spr, Transform* tra ) {
+            int x1 = 0;
+            int y1 = 0;
+            int x2 = spr->width;
+            int y2 = spr->height;
 
             int	u1 = spr->u_off + (( flipmode & GL_FLIP_H ) ? spr->width-1  : 0);
             int	u2 = spr->u_off + (( flipmode & GL_FLIP_H ) ? 0			    : spr->width);
             int v1 = spr->v_off + (( flipmode & GL_FLIP_V ) ? spr->height-1 : 0);
             int v2 = spr->v_off + (( flipmode & GL_FLIP_V ) ? 0 		    : spr->height);
-
-
 
             if ( spr->textureID != gCurrentTexture )
             {
@@ -162,14 +184,21 @@ namespace RGNDS {
                 gCurrentTexture = spr->textureID;
             }
 
-            glBegin( GL_QUADS );
+            s32 scale = (s32)((1 << 12) * tra->scale);
+            glPushMatrix();
 
-                gxTexcoord2i( u1, v1 ); gxVertex3i( x1, y1, g_depth );
-                gxTexcoord2i( u1, v2 ); gxVertex2i( x1, y2 );
-                gxTexcoord2i( u2, v2 ); gxVertex2i( x2, y2 );
-                gxTexcoord2i( u2, v1 ); gxVertex2i( x2, y1 );
+                gxTranslate3f32( tra->pos.x * tra->scale, tra->pos.y * tra->scale, 0 );
+                gxScalef32( scale , scale, 1 << 12 );
 
-            glEnd();
+                glBegin( GL_QUADS );
+
+                    gxTexcoord2i( u1, v1 ); gxVertex3i( x1, y1, g_depth );
+                    gxTexcoord2i( u1, v2 ); gxVertex2i( x1, y2 );
+                    gxTexcoord2i( u2, v2 ); gxVertex2i( x2, y2 );
+                    gxTexcoord2i( u2, v1 ); gxVertex2i( x2, y1 );
+
+                glEnd();
+            glPopMatrix(1);
 
             g_depth++;
         }
@@ -180,8 +209,8 @@ namespace RGNDS {
                            int                  bmp_wid,
                            int                  bmp_hei,
                            GL_TEXTURE_TYPE_ENUM type,
-                           int 	                sizeX,
-                           int 	                sizeY,
+                           GL_TEXTURE_SIZE_ENUM sizeX,
+                           GL_TEXTURE_SIZE_ENUM sizeY,
                            int 	                param,
                            int					pallette_width,
                            const u16			*palette,
@@ -214,7 +243,48 @@ namespace RGNDS {
             return textureID;
         }
 
+        void glText(const char* text, unsigned short color, Transform* tra,  glImage font[64]) {
+            byte* ptr = (byte*)text;
+            byte c = *ptr;
 
+            Engine_Log("font: " << &font[0] << defaultFont);
+
+            Transform t;
+            t.scale = tra->scale * 2;
+            t.pos = tra->pos;
+
+            glColor( color );
+
+            while(c != 0) {
+
+            // Handle special cases
+                if((char)c == '\n') {
+                    t.pos.x = tra->pos.x;
+                    t.pos.y += 8;
+
+                    ptr++;
+                    c = *ptr;
+                    continue;
+                }
+
+            // convert lowercase to uppercase letters
+                if(c > 96 && c < 173)
+                    c -= 32;
+
+            // make sure only the supported characters are displayed
+                if(c <32 || c > 95)
+                    c = 32;
+
+            // Translate Char to TileIndex
+                glSprite(GL_FLIP_NONE, &(font[c-32]), &t);
+
+                t.pos.x += 8;
+                ptr++;
+                c = *ptr;
+            }
+
+            glColor(0xFFFF);
+        }
     }
 }
 

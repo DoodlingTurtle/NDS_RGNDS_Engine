@@ -70,6 +70,13 @@ namespace RGNDS {
 
     void Engine::error(const char* msg, int code) {
         this->keepRunning = false;
+        if(this->errorCode != 0) {
+            consoleDemoInit();
+            printf("Error %d: %s", code, msg);
+            while(true) {
+                swiWaitForVBlank();
+            }
+        }
         this->lastError = msg;
         this->errorCode = code ? code : -1;
     }
