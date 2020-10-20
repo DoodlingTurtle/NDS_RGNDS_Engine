@@ -189,6 +189,7 @@ namespace RGNDS {
 
                 gxTranslate3f32( tra->pos.x * tra->scale, tra->pos.y * tra->scale, 0 );
                 gxScalef32( scale , scale, 1 << 12 );
+                glRotateZi( (tra->ang / PI2 * 0x7fff) );
 
                 glBegin( GL_QUADS );
 
@@ -247,11 +248,10 @@ namespace RGNDS {
             byte* ptr = (byte*)text;
             byte c = *ptr;
 
-            Engine_Log("font: " << &font[0] << defaultFont);
-
             Transform t;
-            t.scale = tra->scale * 2;
+            t.scale = tra->scale;
             t.pos = tra->pos;
+            t.ang = tra->ang;
 
             glColor( color );
 
@@ -260,7 +260,7 @@ namespace RGNDS {
             // Handle special cases
                 if((char)c == '\n') {
                     t.pos.x = tra->pos.x;
-                    t.pos.y += 8;
+                    t.pos.y += font->height;
 
                     ptr++;
                     c = *ptr;
@@ -278,7 +278,7 @@ namespace RGNDS {
             // Translate Char to TileIndex
                 glSprite(GL_FLIP_NONE, &(font[c-32]), &t);
 
-                t.pos.x += 8;
+                t.pos.x += font->width;
                 ptr++;
                 c = *ptr;
             }
