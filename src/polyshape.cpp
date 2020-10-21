@@ -6,7 +6,7 @@
 namespace RGNDS {
     namespace GL2D {
 
-        PolyShape* PolyShape::createCircle(float radius, int edges, int thickness) {
+        PolyShape* PolyShape::createCircle(float radius, int edges, float thickness) {
             double angSteps = PI2 / (float)edges;
             double ang = 0;
             int a;
@@ -14,7 +14,7 @@ namespace RGNDS {
             float radiusinner = 0;
 
             if(thickness > 0)
-                radiusinner = std::min(radius-1, radius-thickness);
+                radiusinner = std::fmin(radius-0.001, radius-thickness);
 
             Point<double> p[edges*2+2];
 

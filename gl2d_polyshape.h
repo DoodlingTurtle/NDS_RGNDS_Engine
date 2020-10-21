@@ -10,7 +10,7 @@ namespace RGNDS {
         class PolyShape {
         public:
 
-            static PolyShape* createCircle(float radius, int edges, int thickness=0);
+            static PolyShape* createCircle(float radius, int edges, float thickness=0);
 
 
             /* rendermode:
