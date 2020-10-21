@@ -2,6 +2,7 @@
 #define __RGNDS_GL2D_CPP__ 1
 
 #include <climits>
+#include <math.h>
 
 #include "../inc/gl2d.h"
 #include "../inc/fonts_res.h"
@@ -33,6 +34,7 @@ extern int gCurrentTexture;
 namespace RGNDS {
     namespace GL2D {
 
+        static int polyId=0;
 
         int defaultFont_TextureID;
         glImage defaultFont[64];
@@ -53,6 +55,8 @@ namespace RGNDS {
 
             // enable antialiasing
             glEnable( GL_ANTIALIAS );
+
+            glEnable( GL_BLEND );
 
             // setup the rear plane
             glClearColor( 0, 0, 0, 31 ); // BG must be opaque for AA to work
@@ -131,7 +135,7 @@ namespace RGNDS {
 
             gCurrentTexture = 0; // set current texture to 0
             g_depth = 0; 	// set depth to 0. We need this var since we cannot disable depth testing
-
+            polyId = 0;
         }
 
         void glEnd2D( void ) {
@@ -144,12 +148,16 @@ namespace RGNDS {
 
         }
 
-        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* tra) {
+        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* tra, int alpha) {
             if(numPoints <= 0) return;
 
             glBindTexture( 0, 0 );
             glColor(color);
             glPushMatrix();
+                if(alpha > 0) {
+                    polyId = (polyId+1)%64;
+                    glPolyFmt(POLY_ALPHA(std::fmax(0, std::fmin(alpha, 31))) | POLY_CULL_NONE | POLY_ID(polyId));
+                }
                 glBegin(mode);
                     glTranslatef32(tra->pos.x, tra->pos.y, 1);
                     glRotateZ((tra->ang / PI2) * 356); //(tra->ang / PI2) * (0xffff - SHRT_MAX));
@@ -160,11 +168,25 @@ namespace RGNDS {
                         gxVertex2i(aPoints[a].x, aPoints[a].y);
                     }
                 glEnd();
+                if(alpha > 0) {
+                    polyId = (polyId+1)%64;
+                    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(polyId));
+                }
             glPopMatrix(1);
 
             glColor(0x7fff);
             g_depth++;
             gCurrentTexture = 0;
+        }
+
+        void glPixel(int x, int y, int color, int alpha) {
+            Point<double> p[4] = {
+                {(double)x,   (double)y  }
+              , {(double)x+1, (double)y  }
+              , {(double)x+1, (double)y+1}
+              , {(double)x,   (double)y+1}
+            };
+            glShape(GL_QUADS, color, 4, p, &Transform::_default, alpha);
         }
 
         void glSprite(int flipmode, const glImage *spr, Transform* tra ) {

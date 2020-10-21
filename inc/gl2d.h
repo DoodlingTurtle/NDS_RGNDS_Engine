@@ -35,8 +35,10 @@ namespace RGNDS {
         void glBegin2D();
         void glEnd2D();
 
-        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<float> aPoints[], Transform* t = &Transform::_default);
+        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<float> aPoints[], Transform* t = &Transform::_default, int alpha=0);
         void glSprite( int x, int y, int flipmode, const glImage *spr, Transform* tra = &Transform::_default );
+
+        void glPixel(int x, int y, int color, int alpha);
 
         void glText(const char* text, unsigned short color, Transform* trans, glImage font[64] = defaultFont);
 

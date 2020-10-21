@@ -45,9 +45,9 @@ namespace RGNDS {
                 free(points);
         }
 
-        void PolyShape::draw(unsigned short color, short screen, Transform* t) {
+        void PolyShape::draw(unsigned short color, short screen, Transform* t, int alpha) {
             t->pos.y -= screen;
-            glShape(rendertype, color, numPoints, points, t);
+            glShape(rendertype, color, numPoints, points, t, alpha);
             t->pos.y += screen;
         }
 
