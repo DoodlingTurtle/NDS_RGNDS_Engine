@@ -26,19 +26,19 @@ namespace RGNDS {
         if(initialized) return;
 
     // Setup VRAM for displaying textures
-        // BANK C and D are used as display-buffer for gl2d
         videoSetMode(MODE_5_3D);        // Top-Screen will always output gl2d
         videoSetModeSub(MODE_5_2D);     // The bottom screen needs some trickery to output gl2d to
 
-        vramSetBankA(VRAM_A_TEXTURE);       // VRAM Bank A and B will give you 256KB of texture space for sprites
+        vramSetBankA(VRAM_A_TEXTURE);       // VRAM Bank A and B will give you 256KB of texture space for gl2d sprites
         vramSetBankB(VRAM_B_TEXTURE);
+        // VRAM Bank C and D will be used for outputing to the Screens
         vramSetBankF(VRAM_F_TEX_PALETTE);
 
-    // For the Bottom Screen, The OAM / Sprite system is used to act as a buffer to display gl2d
+    // For the Bottom Screen, The OAM / Sprite system is used to act as a buffer to display the render of gl2d
         oamInit(&oamSub, SpriteMapping_Bmp_2D_256, false);
 
+    // arrange sprites, so they fill out the entire bottom screen
         int id = 0, y = 0, x = 0;
-
         for(y = 0; y < 3; y++)
             for(x = 0; x < 4; x++)
             {
@@ -53,11 +53,11 @@ namespace RGNDS {
 
         bgInitSub(3, BgType_Bmp16, BgSize_B16_256x256, 0, 0);
 
-        RGNDS::GL2D::glScreen2D();           // Initialize GL2D Engine
+        RGNDS::GL2D::glScreen2D();  // Initialize GL2D Engine
 
-        Timer::init();   // Setup timer for the Engine
+        Timer::init();              // Setup timer for the Engine
 
-        Engine_Debug_Init();
+        Engine_Debug_Init();        // Initalize the Debug output
 
         Engine::initialized = true;
     }
@@ -87,6 +87,7 @@ namespace RGNDS {
 
     void Engine::run() {
 
+        keepRunning = true;
         int tmp = onStart();
         if(tmp > 0)
             this->error("init failed: ", tmp);
@@ -96,13 +97,14 @@ namespace RGNDS {
         while(this->keepRunning) {
             frame++;
 
+            // update logic every second frAME
             if(frame&1) {
                 RGNDS::Timer::nextCycle();
                 deltaTime = RGNDS::Timer::getDeltaTime() / 1000.0f;
                 this->onUpdate( deltaTime );
             }
 
-    // wait for capture unit to be ready
+            // wait for capture unit to be ready
             while(REG_DISPCAPCNT & DCAP_ENABLE);
 
             if((frame&1) == 0) {
@@ -138,47 +140,4 @@ namespace RGNDS {
 
         this->onEnd();
     }
-
-/*
-    void Engine::drawText(int x, int y, const char* txt, u16 color) {
-        byte* ptr = (byte*)txt;
-        byte c = *ptr;
-
-        glColor( color );
-
-        int newX = x;
-        int newY = y;
-        while(c != 0) {
-
-        // Handle special cases
-            if((char)c == '\n') {
-                newX = x;
-                newY += 8;
-
-                ptr++;
-                c = *ptr;
-                continue;
-            }
-
-
-        // convert lowercase to uppercase letters
-            if(c > 96 && c < 173)
-                c -= 32;
-
-        // make sure only the supported characters are displayed
-            if(c <32 || c > 95)
-                c = 32;
-
-        // Translate Char to TileIndex
-            EngineGL2D::glSprite(newX, newY, EngineGL2D::GL_FLIP_NONE, &(font[c-32]));
-
-            newX+=8;
-            ptr++;
-            c = *ptr;
-        }
-
-        glColor(0xFFFF);
-
-    }
-    */
 }
