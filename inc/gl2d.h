@@ -32,7 +32,7 @@ namespace RGNDS {
         void SetOrtho();
 
         void glScreen2D();
-        void glBegin2D();
+        void glBegin2D( float screenoffsety = 0 );
         void glEnd2D();
 
         void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<float> aPoints[], Transform* t = &Transform::_default, int alpha=0);

@@ -113,7 +113,7 @@ namespace RGNDS {
                 vramSetBankD(VRAM_D_SUB_SPRITE);
                 REG_DISPCAPCNT = DCAP_BANK(2) | DCAP_ENABLE | DCAP_SIZE(3);
                 RGNDS::GL2D::glBegin2D();
-                this->onDraw( deltaTime, 0 );
+                this->onDraw( deltaTime, ENGINE_SCREEN_TOP );
                 RGNDS::GL2D::glEnd2D();
             }
             else {
@@ -121,8 +121,8 @@ namespace RGNDS {
                 vramSetBankD(VRAM_D_LCD);
                 vramSetBankC(VRAM_C_SUB_BG);
             	REG_DISPCAPCNT = DCAP_BANK(3) | DCAP_ENABLE | DCAP_SIZE(3);
-            	RGNDS::GL2D::glBegin2D();
-                this->onDraw( deltaTime, SCREEN_HEIGHT );
+            	RGNDS::GL2D::glBegin2D(SCREEN_HEIGHT);
+                this->onDraw( deltaTime, ENGINE_SCREEN_BOTTOM );
                 RGNDS::GL2D::glEnd2D();
             }
             glFlush(0);

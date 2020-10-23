@@ -28,11 +28,14 @@
 #include "inc/point.h"
 
 namespace RGNDS {
-
+    
     class Engine {
         public:
 
-
+            enum Screen {
+                ENGINE_SCREEN_TOP,
+                ENGINE_SCREEN_BOTTOM
+            };
 
             static void init();
 
@@ -62,7 +65,7 @@ namespace RGNDS {
 
             virtual void onUpdate( float deltaTime ){};
 
-            virtual void onDraw(float deltaTime, int screenYOffset){};
+            virtual void onDraw(float deltaTime, Screen screen){};
 
 
 

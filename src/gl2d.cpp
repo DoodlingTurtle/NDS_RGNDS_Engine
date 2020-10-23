@@ -103,7 +103,7 @@ namespace RGNDS {
 
         }
 
-        void glBegin2D( void ) {
+        void glBegin2D( float screenoffset ) {
 
 
             // save 3d perpective projection matrix
@@ -132,6 +132,8 @@ namespace RGNDS {
 
             glMatrixMode( GL_MODELVIEW );		// reset modelview matrix. No need to scale up by << 12
             glLoadIdentity();
+
+            glTranslatef32(1, -screenoffset, 1);
 
             gCurrentTexture = 0; // set current texture to 0
             g_depth = 0; 	// set depth to 0. We need this var since we cannot disable depth testing
