@@ -1,6 +1,8 @@
 #ifndef __RGNDS_GL2D_H__
 #define __RGNDS_GL2D_H__ 1
 
+#include <nds/arm9/videoGL.h>
+
 #include "../transform.h"
 
 typedef struct

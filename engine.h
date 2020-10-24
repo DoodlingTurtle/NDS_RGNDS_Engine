@@ -2,7 +2,6 @@
 #define __RGNDS_ENGINE_H__ 1
 
 #include <nds.h>
-#include <nds/arm9/videoGL.h>
 
 #ifndef PI
 #define PI 3.141592653589793238462643383279

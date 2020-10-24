@@ -1,7 +1,6 @@
 #ifndef __RGNDS_GL2D_POLYSHAPE_H__
 #define __RGNDS_GL2D_POLYSHAPE_H__ 1
 
-#include "inc/gl2d.h"
 #include "transform.h"
 #include "inc/gl2d.h"
 
