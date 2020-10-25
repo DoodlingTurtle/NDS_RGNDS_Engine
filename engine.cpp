@@ -15,7 +15,7 @@
 #include "src/gl2d.cpp"
 #include "src/transform.cpp"
 #include "src/polyshape.cpp"
-
+#include "src/broadcast.cpp"
 
 namespace RGNDS {
 
