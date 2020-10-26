@@ -1,4 +1,7 @@
 #include "../broadcast.h"
+#include "../engine.h"
+
+#include <map>
 
 namespace RGNDS {
 
@@ -20,8 +23,19 @@ namespace RGNDS {
     }
 
     void Broadcast::transmit(int event, void* data) {
-        for(std::function<void(int, void*)>* l : listeners) 
+
+        std::map<std::function<void(int, void*)>*, bool> processed;
+        std::function<void(int, void*)>* l;
+
+        for(int a = listeners.size()-1; a >= 0; a--) {
+            l = listeners.at(a);
+
+            if(processed.find(l) != processed.end()) continue;
+
             ((std::function<void(int, void*)>)*l)(event, data);
+
+            processed.insert(processed.begin(), std::pair<std::function<void(int, void*)>*, bool>(l, true));
+        }
     }
 
 }
