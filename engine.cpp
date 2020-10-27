@@ -69,16 +69,11 @@ namespace RGNDS {
     }
 
     void Engine::error(const char* msg, int code) {
-        this->keepRunning = false;
-        if(this->errorCode != 0) {
-            consoleDemoInit();
-            printf("Error %d: %s", code, msg);
-            while(true) {
-                swiWaitForVBlank();
-            }
-        }
-        this->lastError = msg;
-        this->errorCode = code ? code : -1;
+		consoleDemoInit();
+		printf("Error %d: %s", code, msg);
+		while(true) {
+			swiWaitForVBlank();
+		}
     }
 
     void Engine::exit() {
@@ -128,14 +123,6 @@ namespace RGNDS {
             glFlush(0);
             swiWaitForVBlank();
 
-        }
-
-        if(this->errorCode != 0) {
-            consoleDemoInit();
-            printf("Error %d: %s", this->errorCode, this->lastError);
-            while(true) {
-                swiWaitForVBlank();
-            }
         }
 
         this->onEnd();

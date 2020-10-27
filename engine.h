@@ -57,7 +57,7 @@ namespace RGNDS {
              */
             virtual int onStart(){ return 2; }
 
-            /* \brief only called once, when the Application should be closed
+            /* \brief only called once, when the Application should be closed (after exit has been called)
              *        use this function to free or delete all allocated Memory or created objects
              */
             virtual void onEnd(){}
@@ -71,10 +71,8 @@ namespace RGNDS {
         private:
             bool keepRunning;           // set to false, if the Main-Loop should stop to repeat itself
 
-            const char* lastError;
-            int   errorCode;
-
-            static bool initialized;    //
+            static bool initialized;    // tells if the Engine has been initialized
+										// TODO: (DoTu) Implement
             static int FontTilesTextureID;
 
     };
