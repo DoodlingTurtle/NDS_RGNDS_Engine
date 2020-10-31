@@ -4,7 +4,7 @@
 #include <climits>
 #include <math.h>
 
-#include "../inc/gl2d.h"
+#include "../gl2d.h"
 #include "../inc/fonts_res.h"
 
 inline void gxVertex3i(v16 x, v16 y, v16 z) {

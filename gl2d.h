@@ -3,7 +3,7 @@
 
 #include <nds/arm9/videoGL.h>
 
-#include "../transform.h"
+#include "transform.h"
 
 typedef struct
         {
