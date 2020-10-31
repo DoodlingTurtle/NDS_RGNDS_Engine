@@ -89,7 +89,7 @@ namespace RGNDS {
 
         byte frame = 1;
         float deltaTime = 0.0f;
-        while(this->keepRunning) {
+        while(keepRunning) {
             frame++;
 
             // update logic every second frAME
@@ -98,6 +98,8 @@ namespace RGNDS {
                 deltaTime = RGNDS::Timer::getDeltaTime() / 1000.0f;
                 this->onUpdate( deltaTime );
             }
+
+            if(!keepRunning) break;
 
             // wait for capture unit to be ready
             while(REG_DISPCAPCNT & DCAP_ENABLE);
