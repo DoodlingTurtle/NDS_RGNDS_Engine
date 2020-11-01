@@ -268,7 +268,7 @@ namespace RGNDS {
             return textureID;
         }
 
-        void glText(const char* text, unsigned short color, Transform* tra,  glImage font[64]) {
+        void glText(const char* text, unsigned short color, Transform* tra, int alpha, glImage font[64]) {
             byte* ptr = (byte*)text;
             byte c = *ptr;
 
@@ -278,6 +278,11 @@ namespace RGNDS {
             t.ang = tra->ang;
 
             glColor( color );
+
+            if(alpha < 31) {
+                polyId = (polyId+1)%64;
+                glPolyFmt(POLY_ALPHA(std::fmax(0, std::fmax(alpha, 0))) | POLY_CULL_NONE | POLY_ID(polyId));
+            }
 
             while(c != 0) {
 
@@ -305,6 +310,11 @@ namespace RGNDS {
                 t.pos.x += font->width;
                 ptr++;
                 c = *ptr;
+            }
+
+            if(alpha < 31) {
+                polyId = (polyId+1)%64;
+                glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(polyId));
             }
 
             glColor(0xFFFF);

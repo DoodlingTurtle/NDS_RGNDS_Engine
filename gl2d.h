@@ -42,7 +42,7 @@ namespace RGNDS {
 
         void glPixel(int x, int y, int color, int alpha);
 
-        void glText(const char* text, unsigned short color, Transform* trans, glImage font[64] = defaultFont);
+        void glText(const char* text, unsigned short color, Transform* trans, int alpha = 31, glImage font[64] = defaultFont);
 
         int glLoadTileSet(
            glImage              *sprite,
