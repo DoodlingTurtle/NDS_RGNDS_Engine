@@ -22,8 +22,44 @@ namespace RGNDS {
     int     Engine::FontTilesTextureID;
     bool    Engine::initialized = false;
 
+    Engine* Engine::_currentInstance = nullptr;
+    std::vector<Engine*> Engine::_instances = std::vector<Engine*>();
+
+    void Engine::onVBlank() {
+        if(_currentInstance == nullptr || _currentInstance->renderdone) return;
+
+        while(REG_DISPCAPCNT & DCAP_ENABLE);
+
+        lcdMainOnBottom();
+        vramSetBankC(VRAM_C_LCD);
+        vramSetBankD(VRAM_D_SUB_SPRITE);
+        REG_DISPCAPCNT = DCAP_BANK(2) | DCAP_ENABLE | DCAP_SIZE(3);
+        RGNDS::GL2D::glBegin2D();
+        _currentInstance->onDraw( 0.0, ENGINE_SCREEN_TOP );
+        RGNDS::GL2D::glEnd2D();
+        glFlush(0);
+
+        while(REG_DISPCAPCNT & DCAP_ENABLE);
+
+        lcdMainOnTop();
+        vramSetBankD(VRAM_D_LCD);
+        vramSetBankC(VRAM_C_SUB_BG);
+        REG_DISPCAPCNT = DCAP_BANK(3) | DCAP_ENABLE | DCAP_SIZE(3);
+        RGNDS::GL2D::glBegin2D(SCREEN_HEIGHT);
+        _currentInstance->onDraw( 0.0, ENGINE_SCREEN_BOTTOM );
+        RGNDS::GL2D::glEnd2D();
+        glFlush(0);
+
+        _currentInstance->renderdone = true;
+    }
+
+
     void Engine::init() {
         if(initialized) return;
+
+        irqInit();
+        irqSet(IRQ_VBLANK, onVBlank);
+        irqEnable(IRQ_VBLANK);
 
     // Setup VRAM for displaying textures
         videoSetMode(MODE_5_3D);        // Top-Screen will always output gl2d
@@ -64,6 +100,7 @@ namespace RGNDS {
 
     Engine::Engine() {
         this->keepRunning = true;
+        this->renderdone = false;
     }
     Engine::~Engine(){
     }
@@ -81,50 +118,36 @@ namespace RGNDS {
     }
 
     void Engine::run() {
-
+        
         keepRunning = true;
         int tmp = onStart();
         if(tmp > 0)
             this->error("init failed: ", tmp);
 
+        if(_currentInstance != nullptr)
+            _instances.push_back(_currentInstance);
+
+        _currentInstance = this;
+
         byte frame = 1;
         float deltaTime = 0.0f;
         while(keepRunning) {
-            frame++;
 
-            // update logic every second frAME
-            if(frame&1) {
-                RGNDS::Timer::nextCycle();
-                deltaTime = RGNDS::Timer::getDeltaTime() / 1000.0f;
-                this->onUpdate( deltaTime );
-            }
+            RGNDS::Timer::nextCycle();
+            deltaTime = RGNDS::Timer::getDeltaTime() / 1000.0f;
+            this->onUpdate( deltaTime );
 
             if(!keepRunning) break;
 
-            // wait for capture unit to be ready
-            while(REG_DISPCAPCNT & DCAP_ENABLE);
-
-            if((frame&1) == 0) {
-                lcdMainOnBottom();
-                vramSetBankC(VRAM_C_LCD);
-                vramSetBankD(VRAM_D_SUB_SPRITE);
-                REG_DISPCAPCNT = DCAP_BANK(2) | DCAP_ENABLE | DCAP_SIZE(3);
-                RGNDS::GL2D::glBegin2D();
-                this->onDraw( deltaTime, ENGINE_SCREEN_TOP );
-                RGNDS::GL2D::glEnd2D();
-            }
-            else {
-                lcdMainOnTop();
-                vramSetBankD(VRAM_D_LCD);
-                vramSetBankC(VRAM_C_SUB_BG);
-            	REG_DISPCAPCNT = DCAP_BANK(3) | DCAP_ENABLE | DCAP_SIZE(3);
-            	RGNDS::GL2D::glBegin2D(SCREEN_HEIGHT);
-                this->onDraw( deltaTime, ENGINE_SCREEN_BOTTOM );
-                RGNDS::GL2D::glEnd2D();
-            }
-            glFlush(0);
+            renderdone = false;
             swiWaitForVBlank();
 
+        }
+
+        _currentInstance = nullptr;
+        if(_instances.size() > 0) {
+            _currentInstance = _instances.at(_instances.size()-1);
+            _instances.pop_back();
         }
 
         this->onEnd();

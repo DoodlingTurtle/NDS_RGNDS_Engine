@@ -1,6 +1,7 @@
 #ifndef __RGNDS_ENGINE_H__
 #define __RGNDS_ENGINE_H__ 1
 
+#include <vector>
 #include <nds.h>
 
 #ifndef PI
@@ -69,6 +70,13 @@ namespace RGNDS {
 
 
         private:
+            bool renderdone;
+
+            static Engine* _currentInstance;
+            static std::vector<Engine*> _instances;
+
+            static void onVBlank();
+
             bool keepRunning;           // set to false, if the Main-Loop should stop to repeat itself
 
             static bool initialized;    // tells if the Engine has been initialized
