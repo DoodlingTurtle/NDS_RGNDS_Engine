@@ -136,7 +136,6 @@ namespace RGNDS {
             glTranslatef32(1, -screenoffset, 1);
 
             gCurrentTexture = 0; // set current texture to 0
-            g_depth = 0; 	// set depth to 0. We need this var since we cannot disable depth testing
             polyId = 0;
         }
 
@@ -150,7 +149,7 @@ namespace RGNDS {
 
         }
 
-        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* tra, int alpha) {
+        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* tra, int alpha=0, int zDepth=0) {
             if(numPoints <= 0) return;
 
             glBindTexture( 0, 0 );
@@ -165,7 +164,8 @@ namespace RGNDS {
                     glRotateZ((tra->ang / PI2) * 356); //(tra->ang / PI2) * (0xffff - SHRT_MAX));
                     glScalef32((1<<12) * tra->scale, (1<<12) * tra->scale, (1<<12));
 
-                    gxVertex3i( aPoints[0].x, aPoints[0].y, g_depth );
+                    gxVertex3i( aPoints[0].x, aPoints[0].y, zDepth);
+                        
                     for(int a = 1; a < numPoints; a++) {
                         gxVertex2i(aPoints[a].x, aPoints[a].y);
                     }
@@ -177,21 +177,20 @@ namespace RGNDS {
             glPopMatrix(1);
 
             glColor(0x7fff);
-            g_depth++;
             gCurrentTexture = 0;
         }
 
-        void glPixel(int x, int y, int color, int alpha) {
+        void glPixel(int x, int y, int color, int alpha, int zDepth) {
             Point<double> p[4] = {
                 {(double)x,   (double)y  }
               , {(double)x+1, (double)y  }
               , {(double)x+1, (double)y+1}
               , {(double)x,   (double)y+1}
             };
-            glShape(GL_QUADS, color, 4, p, &Transform::_default, alpha);
+            glShape(GL_QUADS, color, 4, p, &Transform::_default, alpha, zDepth);
         }
 
-        void glSprite(int flipmode, const glImage *spr, Transform* tra ) {
+        void glSprite(int flipmode, const glImage *spr, Transform* tra, int zDepth) {
             int x1 = 0;
             int y1 = 0;
             int x2 = spr->width;
@@ -217,15 +216,13 @@ namespace RGNDS {
 
                 glBegin( GL_QUADS );
 
-                    gxTexcoord2i( u1, v1 ); gxVertex3i( x1, y1, g_depth );
+                    gxTexcoord2i( u1, v1 ); gxVertex3i( x1, y1, zDepth );
                     gxTexcoord2i( u1, v2 ); gxVertex2i( x1, y2 );
                     gxTexcoord2i( u2, v2 ); gxVertex2i( x2, y2 );
                     gxTexcoord2i( u2, v1 ); gxVertex2i( x2, y1 );
 
                 glEnd();
             glPopMatrix(1);
-
-            g_depth++;
         }
 
         int glLoadTileSet( glImage              *sprite,
@@ -268,7 +265,7 @@ namespace RGNDS {
             return textureID;
         }
 
-        void glText(const char* text, unsigned short color, Transform* tra, int alpha, glImage font[64]) {
+        void glText(const char* text, unsigned short color, Transform* tra, int alpha, int zDepth, glImage font[64]) {
             byte* ptr = (byte*)text;
             byte c = *ptr;
 
@@ -305,7 +302,7 @@ namespace RGNDS {
                     c = 32;
 
             // Translate Char to TileIndex
-                glSprite(GL_FLIP_NONE, &(font[c-32]), &t);
+                glSprite(GL_FLIP_NONE, &(font[c-32]), &t, zDepth);
 
                 t.pos.x += font->width;
                 ptr++;

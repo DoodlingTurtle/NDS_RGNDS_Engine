@@ -33,7 +33,7 @@ namespace RGNDS {
             PolyShape(short numTris, const Point<double> aTris[], GL_GLBEGIN_ENUM rendermode);
             virtual ~PolyShape();
 
-            virtual void draw(unsigned short color, Transform* t = &Transform::_default, int alpha=0);
+            virtual void draw(unsigned short color, Transform* t = &Transform::_default, int alpha=0, float zDepth=0.00);
 
             unsigned short color;
 
