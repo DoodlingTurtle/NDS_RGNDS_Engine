@@ -129,7 +129,6 @@ namespace RGNDS {
 
         _currentInstance = this;
 
-        byte frame = 1;
         float deltaTime = 0.0f;
         while(keepRunning) {
 

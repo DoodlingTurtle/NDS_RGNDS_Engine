@@ -148,8 +148,7 @@ namespace RGNDS {
             glPopMatrix( 1 );
 
         }
-
-        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* tra, int alpha=0, int zDepth=0) {
+        void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* tra, int alpha, int zDepth) {
             if(numPoints <= 0) return;
 
             glBindTexture( 0, 0 );
