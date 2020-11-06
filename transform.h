@@ -24,6 +24,8 @@ namespace RGNDS {
         void setAngle(float radiants);
         void setAngleRel( float radiants );
 
+        void directionFromPositionVector();
+
         float ang = 0.0;
         Point<float> dir = {1.0f, 0.0f};
 

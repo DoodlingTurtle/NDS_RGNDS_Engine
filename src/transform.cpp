@@ -2,6 +2,7 @@
 #define __RGNDS_TRANSFORM_CPP__ 1
 
 #include "../transform.h"
+#include <math.h>
 
 namespace RGNDS {
     Transform Transform::_default = Transform();
@@ -28,6 +29,12 @@ namespace RGNDS {
 
     void Transform::moveInDirection( float distance ) {
         pos += dir * distance;
+    }
+
+    void Transform::directionFromPositionVector() {
+        float dist = sqrt(pos.x * pos.x + pos.y * pos.y);
+        dir.x = pos.x / dist;
+        dir.y = pos.y / dist;
     }
 }
 #endif // __RGNDS_TRANSFORM_CPP__
