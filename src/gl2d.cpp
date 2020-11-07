@@ -209,7 +209,7 @@ namespace RGNDS {
             s32 scale = (s32)((1 << 12) * tra->scale);
             glPushMatrix();
 
-                gxTranslate3f32( tra->pos.x * tra->scale, tra->pos.y * tra->scale, 0 );
+                gxTranslate3f32( tra->pos.x, tra->pos.y, 0 );
                 gxScalef32( scale , scale, 1 << 12 );
                 glRotateZi( (tra->ang / PI2 * 0x7fff) );
 
@@ -285,7 +285,7 @@ namespace RGNDS {
             // Handle special cases
                 if((char)c == '\n') {
                     t.pos.x = tra->pos.x;
-                    t.pos.y += font->height;
+                    t.pos.y += font->height*tra->scale;
 
                     ptr++;
                     c = *ptr;
@@ -303,7 +303,7 @@ namespace RGNDS {
             // Translate Char to TileIndex
                 glSprite(GL_FLIP_NONE, &(font[c-32]), &t, zDepth);
 
-                t.pos.x += font->width;
+                t.pos.x += font->width*tra->scale;
                 ptr++;
                 c = *ptr;
             }

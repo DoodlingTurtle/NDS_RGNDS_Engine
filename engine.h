@@ -65,7 +65,7 @@ namespace RGNDS {
 
             virtual void onUpdate( float deltaTime ){};
 
-            virtual void onDraw(float deltaTime, Screen screen){};
+            virtual void onDraw(Screen screen){};
 
 
 
