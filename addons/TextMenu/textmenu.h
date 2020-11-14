@@ -2,8 +2,8 @@
 #define __TextMenu_H__
 
 #include <vector>
-#include "../modules/RGNDS_Engine/transform.h"
-#include "../modules/RGNDS_Engine/gl2d.h"
+#include "../../transform.h"
+#include "../../gl2d.h"
 
 namespace RGNDS {
     class TextMenu {
