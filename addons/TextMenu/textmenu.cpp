@@ -1,57 +1,53 @@
 #include "textmenu.h"
 
 #include <cstdio>
+#include <math.h>
+
 #include "../modules/RGNDS_Engine/engine.h"
+
 namespace RGNDS {
 
-    TextMenu::TextMenu() {
+    TextMenu::TextMenu(TextMenuType menuType) {
         cursor = '*';
         iSelected = 0;
+        type = menuType;
+        maxlength = 0;
     }
     TextMenu::~TextMenu() {
-        for(auto o : options)
-            free(o);
-
         options.clear();
     }
 
-    void TextMenu::addOption(char* txt) {
-        
-        int size = 0;
-        char* ptr = &(*txt);
+    void TextMenu::addOption(std::string txt) {
 
-        while(*ptr != 0) {
-            size++;
-            ptr++;
-        }
-        size++;
-        char* buffer = (char*)malloc(sizeof(char)*size);
+        if(txt.length() > maxlength)
+            maxlength = txt.length();
 
-        memcpy(buffer, txt, size-1);
-      
-        if(size > maxlength)
-            maxlength = size;
-
-        buffer[size-1] = 0;
-
-        options.push_back(buffer);
+        options.push_back(txt);
     }
 
     void TextMenu::draw() {
-        char buffer[maxlength+2];
+        char buffer[maxlength+6];
 
         char c;
         int i = 0;
 
-        for( char* txt : options ) {
-            c = (i==iSelected) ? cursor : ' ';
-            i++;
-            
-            sprintf(buffer, "%c %s", c, txt); 
-            RGNDS::GL2D::glText(buffer, 0xffff, &transform, 31, 2);
-            transform.pos.y += 10*transform.scale;
+        switch(type) {
+            case TEXTMENU_SINGLE_HORIZONTAL:
+                sprintf(buffer, "< %s >", options.at(iSelected).c_str()); 
+                RGNDS::GL2D::glText(buffer, 0xffff, &transform, 31, 2);
+                break;
+
+            default:
+            for( auto txt : options ) {
+                c = (i==iSelected) ? cursor : ' ';
+                i++;
+                
+                sprintf(buffer, "%c %s", c, txt.c_str()); 
+                RGNDS::GL2D::glText(buffer, 0xffff, &transform, 31, 2);
+                transform.pos.y += 10*transform.scale;
+            }
+            transform.pos.y -= 10 * options.size() * transform.scale;
         }
-        transform.pos.y -= 10 * options.size() * transform.scale;
     }
 
     void TextMenu::selectNext() {
@@ -76,4 +72,21 @@ namespace RGNDS {
     }
 
     int TextMenu::selected() { return iSelected; }
+
+    void TextMenu::setSelection(int index) {
+        if(index < 0 || index >= options.size())
+            return;
+        
+        iSelected = index;
+    }
+    int TextMenu::getPXWidth() {
+        int width = maxlength;
+        switch(type) {
+            case TEXTMENU_SINGLE_HORIZONTAL:
+                width += 4;
+                break;
+        }
+
+        return width * RGNDS::GL2D::defaultFont[0].width * transform.scale;
+    }
 }
