@@ -1,5 +1,7 @@
 #ifndef __RGNDS_GL2D_CPP__
-#define __RGNDS_GL2D_CPP__ 1
+#define __RGNDS_GL2D_CPP__ 
+
+#include "nds/arm9/videoGL.h"
 
 #include <climits>
 #include <math.h>
@@ -263,6 +265,10 @@ namespace RGNDS {
 
             return textureID;
         }
+
+        void glFreeTileSet(glImage* tileset) {
+            glDeleteTextures(1, &(tileset->textureID));
+        } 
 
         void glText(const char* text, unsigned short color, Transform* tra, int alpha, int zDepth, glImage font[64]) {
             byte* ptr = (byte*)text;
