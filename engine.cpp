@@ -57,7 +57,7 @@ namespace RGNDS {
     void Engine::init() {
         if(initialized) return;
 
-        irqInit();
+//        irqInit();   // <--- bad on new versions of devkitpro/libnds
         irqSet(IRQ_VBLANK, onVBlank);
         irqEnable(IRQ_VBLANK);
 
@@ -65,10 +65,10 @@ namespace RGNDS {
         videoSetMode(MODE_5_3D);        // Top-Screen will always output gl2d
         videoSetModeSub(MODE_5_2D);     // The bottom screen needs some trickery to output gl2d to
 
-        vramSetBankA(VRAM_A_TEXTURE);       // VRAM Bank A and B will give you 256KB of texture space for gl2d sprites
-        vramSetBankB(VRAM_B_TEXTURE);
+        vramSetBankA(VRAM_A_TEXTURE);   // VRAM Bank A and B will give you 256KB of texture space for gl2d sprites
+        vramSetBankB(VRAM_B_TEXTURE);   // - 4K for the default font 
         // VRAM Bank C and D will be used for outputing to the Screens
-        vramSetBankF(VRAM_F_TEX_PALETTE);
+        vramSetBankF(VRAM_F_TEX_PALETTE); // will hold the paletts for the sprites
 
     // For the Bottom Screen, The OAM / Sprite system is used to act as a buffer to display the render of gl2d
         oamInit(&oamSub, SpriteMapping_Bmp_2D_256, false);
