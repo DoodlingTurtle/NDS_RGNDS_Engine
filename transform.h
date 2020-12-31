@@ -12,8 +12,9 @@ namespace RGNDS {
         float scale = 1.0f;
 
         static Transform _default;
+    
 
-        Transform();
+        Transform(float x=0, float y=0);
         virtual ~Transform();
 
         void moveInDirection( float distance );
@@ -29,7 +30,6 @@ namespace RGNDS {
         float ang = 0.0;
         Point<float> dir = {1.0f, 0.0f};
 
-    protected:
 
 
     };

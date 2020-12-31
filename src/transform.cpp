@@ -7,7 +7,10 @@
 namespace RGNDS {
     Transform Transform::_default = Transform();
 
-    Transform::Transform(){}
+    Transform::Transform(float x, float y){
+        pos.x = x;
+        pos.y = y;
+    }
     Transform::~Transform(){}
 
     void Transform::setAngleRel( float radiants ) {
