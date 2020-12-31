@@ -32,6 +32,8 @@ namespace RGNDS {
         void draw();
         RGNDS::Transform transform;
 
+        std::string selectedText();
+
     protected:
         std::vector<std::string> options;
         char cursor; 

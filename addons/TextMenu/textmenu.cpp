@@ -89,4 +89,8 @@ namespace RGNDS {
 
         return width * RGNDS::GL2D::defaultFont[0].width * transform.scale;
     }
+
+    std::string TextMenu::selectedText() {
+        return options.at(iSelected);
+    }
 }
