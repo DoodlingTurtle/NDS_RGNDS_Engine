@@ -44,6 +44,8 @@ namespace RGNDS {
 
         void glText(const char* text, unsigned short color, Transform* trans, int alpha = 31, int zDepth=0, glImage font[64] = defaultFont);
 
+        void glRectFilled(int x, int y, int width, int height, unsigned short color, int alpha=0, int zDepth=0);
+
         int glLoadTileSet(
            glImage              *sprite,
            int                  tile_wid,

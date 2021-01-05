@@ -321,6 +321,21 @@ namespace RGNDS {
 
             glColor(0xFFFF);
         }
+
+        void glRectFilled(int x, int y, int width, int height, unsigned short color, int alpha, int zDepth) {
+
+            RGNDS::Point<double> points[4] = {
+                    {(double)x, (double)y},
+                    {(double)x+(double)width, (double)y},
+                    {(double)x+(double)width, (double)y+(double)height},
+                    {(double)x, (double)y+(double)height}
+            };
+
+            glShape(GL_QUAD, color, 
+                    4, points, &Transform::_default,
+                    alpha, zDepth
+            );
+        }            
     }
 }
 
