@@ -1,5 +1,5 @@
 #ifndef __TextMenu_H__
-#define __TextMenu_H__
+#define __TextMenu_H__ 1
 
 #include <vector>
 #include <string>
@@ -33,6 +33,8 @@ namespace RGNDS {
         RGNDS::Transform transform;
 
         std::string selectedText();
+
+        int zDepth;
 
     protected:
         std::vector<std::string> options;

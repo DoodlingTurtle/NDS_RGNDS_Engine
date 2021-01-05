@@ -12,6 +12,7 @@ namespace RGNDS {
         iSelected = 0;
         type = menuType;
         maxlength = 0;
+        zDepth = 2;
     }
     TextMenu::~TextMenu() {
         options.clear();
@@ -34,7 +35,7 @@ namespace RGNDS {
         switch(type) {
             case TEXTMENU_SINGLE_HORIZONTAL:
                 sprintf(buffer, "< %s >", options.at(iSelected).c_str()); 
-                RGNDS::GL2D::glText(buffer, 0xffff, &transform, 31, 2);
+                RGNDS::GL2D::glText(buffer, 0xffff, &transform, 31, zDepth);
                 break;
 
             default:
@@ -43,7 +44,7 @@ namespace RGNDS {
                 i++;
                 
                 sprintf(buffer, "%c %s", c, txt.c_str()); 
-                RGNDS::GL2D::glText(buffer, 0xffff, &transform, 31, 2);
+                RGNDS::GL2D::glText(buffer, 0xffff, &transform, 31, zDepth);
                 transform.pos.y += 10*transform.scale;
             }
             transform.pos.y -= 10 * options.size() * transform.scale;
