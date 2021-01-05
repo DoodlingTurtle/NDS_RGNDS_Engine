@@ -50,6 +50,10 @@ namespace RGNDS {
 
             void exit();
 
+
+            virtual void onDraw(Screen screen){};
+
+
         protected:
 
             /* \brief should only be called once
@@ -64,9 +68,6 @@ namespace RGNDS {
             virtual void onEnd(){}
 
             virtual void onUpdate( float deltaTime ){};
-
-            virtual void onDraw(Screen screen){};
-
 
 
         private:
