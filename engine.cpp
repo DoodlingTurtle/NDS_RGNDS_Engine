@@ -4,14 +4,14 @@
 #include <math.h>
 
 #include <nds.h>
+#include <filesystem.h>
 #include "inc/fonts_res.h"
 
 
 // Including C/C++ Files into another compiled file is bad practice, but this
-// will allow me to enable / disable what parts of the engine get compiled, depending on the included headers
-// (vFor this to work, 'engine.cpp' must be the last file in your makefiles list of files to compile )
 
 #include "src/timer.cpp"
+#include "src/nitrofs.cpp"
 #include "src/gl2d.cpp"
 #include "src/transform.cpp"
 #include "src/polyshape.cpp"
@@ -60,6 +60,8 @@ namespace RGNDS {
 //        irqInit();   // <--- bad on new versions of devkitpro/libnds
         irqSet(IRQ_VBLANK, onVBlank);
         irqEnable(IRQ_VBLANK);
+
+        nitroFSInit(NULL);
 
     // Setup VRAM for displaying textures
         videoSetMode(MODE_5_3D);        // Top-Screen will always output gl2d

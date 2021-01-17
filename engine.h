@@ -44,20 +44,38 @@ namespace RGNDS {
             /** Default destructor */
             virtual ~Engine();
 
+            /** \brief this will start the Engine until "exit" is called
+             *         from within onUpdate or onDraw
+             *
+             *         you can call the "run" function of another engine from
+             *         within the onUpdate function of another engine
+             *
+             *         but there can only be one active engine at any time
+             */
             void run();
 
             void error(const char* error, int iCode);
 
             void exit();
 
-
+            /** \brief This function is called 60 times per second.
+             *         The rendering of the top and bottom screen are switched on every call.
+             *         Make sure all draw calles and logic in this function are finished withing
+             *         1/60 of a second, otherwise the screens will start to flicker
+             *         //TODO: (DoTu) Fix that
+             * 
+             *          both screens share one coordinate system. 
+             *          Everything above y = 191 will be drawn to the bottom screen
+             *
+             * \param screen - defines, what screen is currently drawing
+             */
             virtual void onDraw(Screen screen){};
 
 
         protected:
 
             /* \brief should only be called once
-             *        code like initial setup of variables should be done here
+             *        code, like the initial setup of variables, should be done here.
              * \return - any value > 0 will not start the engine and is treated as an error-code
              */
             virtual int onStart(){ return 2; }
@@ -67,6 +85,11 @@ namespace RGNDS {
              */
             virtual void onEnd(){}
 
+            /* \brief called 30 times per second 
+             *
+             * \param deltaTime - multiplyer for the time that passed since the last call of onUpdate
+             *                    (example: 1 = 1 Second, 0.5 = halfe a second, etc. ...)
+             */
             virtual void onUpdate( float deltaTime ){};
 
 
