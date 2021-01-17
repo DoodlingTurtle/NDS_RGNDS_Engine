@@ -10,7 +10,6 @@ This framework will continue to expand (and hopefully improve)
 - It sets up both screens, so that both can be drawn to via the 3D engine of the Nintendo DS (at 30 FPS)
 
     - both screens are handled as one large screen (256x384 px in size).
-
     - everything drawn on the Y-coordinate > 192 appears on the bottom screen
 
 - Multiple RGNDS::Engine classes can be treated like, for example, scenes in other engines.
@@ -21,9 +20,8 @@ This framework will continue to expand (and hopefully improve)
 - Provide access to the 3D drawing functions of the Nintendo DS (via RGNDS::GL2D)
 
     - The provided functions are an extension of the original "gl2d", that was included in devkitpro / libnds.
-
     - Drawing of sprites via the original glImage structure (via RGNDS::GL2D::glSprite)
-    
+  
     - Drawing strings directly to the screen (via RGNDS::GL2D::glText)
         - for now only in all CAPS.
     
@@ -37,13 +35,16 @@ This framework will continue to expand (and hopefully improve)
     
 - It handles all the timing of logic and drawing updates.
 
+- provides easy access for loading data from the NitroFS
+    - Use void* RGNDS::Files::loadNitroFS(int filesize, const char* filename) to load binary files
+
 ---
 # TODO
-- Implement easyer filesystem access for both the nitrofs and Gamesaves.
 - Implement music and sfx handling.
-- Allow access to the background and sprite systems of the Nintendo DS (Right now, these are used as framebuffer for the 3D Engine)
 - Implement a 60 FPS mode, that only uses 3D on one screen and sprites and backgrounds on the Other
+- Allow access to the background and sprite systems of the Nintendo DS (Right now, these are used as framebuffer for the 3D Engine)
 - Add support for lowercase text
+- Implement filesystem access for gamesaves.
 
 ---
 # Engine Macros
