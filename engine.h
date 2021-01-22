@@ -54,7 +54,6 @@ namespace RGNDS {
              */
             void run();
 
-            void error(const char* error, int iCode);
 
             void exit();
 
@@ -71,6 +70,13 @@ namespace RGNDS {
              */
             virtual void onDraw(Screen screen){};
 
+            /** \brief Can be called to stop what ever the program is doing, and
+             *         and print a message to the screen 
+             *
+             *  \param error  - the message string to display
+             *  \param iCode  - an error-code, that can make reading the error easyer
+             */
+            static void error(const char* error, int iCode);
 
         protected:
 
