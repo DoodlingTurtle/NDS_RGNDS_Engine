@@ -191,7 +191,7 @@ namespace RGNDS {
             glShape(GL_QUADS, color, 4, p, &Transform::_default, alpha, zDepth);
         }
 
-        void glSprite(int flipmode, const glImage *spr, Transform* tra, int zDepth) {
+        void glSprite(int flipmode, const glImage *spr, Transform* tra, int zDepth, byte alpha) {
             int x1 = 0;
             int y1 = 0;
             int x2 = spr->width;
@@ -201,6 +201,11 @@ namespace RGNDS {
             int	u2 = spr->u_off + (( flipmode & GL_FLIP_H ) ? 0			    : spr->width);
             int v1 = spr->v_off + (( flipmode & GL_FLIP_V ) ? spr->height-1 : 0);
             int v2 = spr->v_off + (( flipmode & GL_FLIP_V ) ? 0 		    : spr->height);
+
+            if(alpha < 31) {
+                polyId = (polyId+1)%64;
+                glPolyFmt(POLY_ALPHA(std::fmax(0, std::fmin(alpha, 31))) | POLY_CULL_NONE | POLY_ID(polyId));
+            }
 
             if ( spr->textureID != gCurrentTexture )
             {
@@ -223,6 +228,11 @@ namespace RGNDS {
                     gxTexcoord2i( u2, v1 ); gxVertex2i( x2, y1 );
 
                 glEnd();
+
+                if(alpha < 31) {
+                    polyId = (polyId+1)%64;
+                    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(polyId));
+                }
             glPopMatrix(1);
         }
 
