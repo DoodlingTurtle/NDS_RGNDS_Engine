@@ -6,9 +6,7 @@
 
 namespace RGNDS {
     namespace Files {
-
-        void* loadNitroFS(int size, const char* filename);
-
+        void* loadNitroFS(const char* filename, int size = 0);
     } 
 }
 #endif

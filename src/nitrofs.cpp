@@ -2,14 +2,20 @@
 
 namespace RGNDS {
     namespace Files {
-        
-        void* loadNitroFS(int size, const char* filename) {
+        void* loadNitroFS(const char* filename, int size) {
             FILE* f = fopen(filename, "rb");
-            void* data = (void*)valloc(size);
+            if(size <= 0) {
+                fseek(f, 0, SEEK_END);
+                size = ftell(f);
+                fseek(f, 0, SEEK_SET);
+            }
+
+            char* data = (char*)valloc(size+1);
             fread(data, size, 1, f);
+            data[size] = 0;
             fclose(f);
 
-            return data;
+            return (void*)data;
         }
     }
 }
