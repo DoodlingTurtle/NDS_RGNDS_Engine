@@ -26,6 +26,7 @@ namespace RGNDS {
         int selected();
 
         void setSelection(int index);
+        void clearOptions();
 
         int getPXWidth();
 

@@ -74,6 +74,11 @@ namespace RGNDS {
 
     int TextMenu::selected() { return iSelected; }
 
+    void TextMenu::clearOptions() {
+        options.clear();
+        iSelected = 0;
+    }
+
     void TextMenu::setSelection(int index) {
         if(index < 0 || index >= options.size())
             return;
