@@ -346,6 +346,36 @@ namespace RGNDS {
                     alpha, zDepth
             );
         }            
+
+        void glShapeVec(GL_GLBEGIN_ENUM mode, short color, std::vector<Point<int>> points, Transform* tra, int alpha, int zDepth) {
+
+            if(points.size() <= 0) return; 
+
+            glBindTexture( 0, 0 );
+            glColor(color);
+            glPushMatrix();
+                if(alpha < 31) {
+                    polyId = (polyId+1)%64;
+                    glPolyFmt(POLY_ALPHA(std::fmax(0, std::fmin(alpha, 31))) | POLY_CULL_NONE | POLY_ID(polyId));
+                }
+                glBegin(mode);
+                    glTranslatef32(tra->pos.x, tra->pos.y, 1);
+                    glRotateZ((tra->ang / PI2) * 356); //(tra->ang / PI2) * (0xffff - SHRT_MAX));
+                    glScalef32((1<<12) * tra->scale, (1<<12) * tra->scale, (1<<12));
+                    
+                    for(auto p : points)
+                        gxVertex3i(p.x, p.y, zDepth);
+
+                glEnd();
+                if(alpha < 31) {
+                    polyId = (polyId+1)%64;
+                    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(polyId));
+                }
+            glPopMatrix(1);
+
+            glColor(0x7fff);
+            gCurrentTexture = 0;
+        }
     }
 }
 

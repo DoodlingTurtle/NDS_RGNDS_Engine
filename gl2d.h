@@ -1,5 +1,6 @@
 #ifndef __RGNDS_GL2D_H__
-#define __RGNDS_GL2D_H__ 1
+#define __RGNDS_GL2D_H__ #include "inc/point.h"
+#include <vector>
 
 #include <nds/arm9/videoGL.h>
 
@@ -38,6 +39,9 @@ namespace RGNDS {
         void glEnd2D();
 
         void glShape(GL_GLBEGIN_ENUM mode, int color, int numPoints, const Point<double> aPoints[], Transform* t = &Transform::_default, int alpha=0, int zDepth=0);
+
+        void glShapeVec(GL_GLBEGIN_ENUM mode, short color, std::vector<Point<int>>, Transform* t = &Transform::_default, int alpha=31, int zDepth=0);
+
         void glSprite( int flipmode, const glImage *spr, Transform* tra = &Transform::_default, int zDepth=0, byte alpha=31);
 
         void glPixel(int x, int y, int color, int alpha=31, int zDepth=0);
